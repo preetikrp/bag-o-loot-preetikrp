@@ -16,4 +16,4 @@ Then reload that file.
 source ~/.zshrc
 ```
 
-Now open up the project in Visual Studio code.
+Now open up the project in Visual Studio code.# BagOLoot_Preeti

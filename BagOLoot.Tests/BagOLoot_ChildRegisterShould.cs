@@ -26,8 +26,17 @@ namespace BagOLoot.Tests
         [Fact]
         public void ReturnListOfChildren()
         {
-            var result = _register.GetChildren();
-            Assert.IsType<List<string>>(result);
+
+            List<Child> children = _register.GetChildren();
+
+            Assert.IsType<List<Child>>(children);
+
+            Assert.True(children.Count > 0);
+
+            int childId = 4;
+            Child child = _register.GetChild(childId);
+            Assert.True(child.childId == childId);
+
         }
     }
 }

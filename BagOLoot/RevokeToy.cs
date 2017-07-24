@@ -5,17 +5,17 @@ using Microsoft.Data.Sqlite;
 
 namespace BagOLoot
 {
-    public class ChildRegister
+    public class revokeToy
     {private List<Child> _children = new List<Child>();
         private string _connectionString = $"Data Source={Environment.GetEnvironmentVariable("BAGOLOOT_DB")}";
         private SqliteConnection _connection;
 
-        public ChildRegister()
+        public revokeToy()
         {
             _connection = new SqliteConnection(_connectionString);
         }
 
-        public bool AddChild (string child) 
+        public bool toyRevoke (int childId, int toyId) 
         {
             int _lastId = 0; // Will store the id of the last inserted record
             using (_connection)
@@ -23,8 +23,8 @@ namespace BagOLoot
                 _connection.Open ();
                 SqliteCommand dbcmd = _connection.CreateCommand ();
 
-                // Insert the new child
-                dbcmd.CommandText = $"insert into child values (null, '{child}', 0)";
+                // Insert the new Toy
+                dbcmd.CommandText = $"delete from Toy where toyID = '{toyId}' and childId =  '{childId}'";
                 Console.WriteLine(dbcmd.CommandText);
                 dbcmd.ExecuteNonQuery ();
 
@@ -62,7 +62,7 @@ namespace BagOLoot
                     //Read each row in the result set
                     while (dr.Read())
                     {
-                         Child newChild = new Child(dr[1].ToString(), dr.GetInt32(0), dr.GetBoolean(2));
+                        Child newChild = new Child(dr[1].ToString(), dr.GetInt32(0), dr.GetBoolean(2));
                         _children.Add(newChild); //Add child name to list
                     }
                 }

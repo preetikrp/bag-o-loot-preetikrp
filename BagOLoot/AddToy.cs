@@ -5,17 +5,17 @@ using Microsoft.Data.Sqlite;
 
 namespace BagOLoot
 {
-    public class ChildRegister
-    {private List<Child> _children = new List<Child>();
+    public class AddToy
+    {private List<Toy> _toys = new List<Toy>();
         private string _connectionString = $"Data Source={Environment.GetEnvironmentVariable("BAGOLOOT_DB")}";
         private SqliteConnection _connection;
 
-        public ChildRegister()
+        public AddToy()
         {
             _connection = new SqliteConnection(_connectionString);
         }
 
-        public bool AddChild (string child) 
+        public bool AssignToy (int childId, string toyName) 
         {
             int _lastId = 0; // Will store the id of the last inserted record
             using (_connection)
@@ -23,8 +23,8 @@ namespace BagOLoot
                 _connection.Open ();
                 SqliteCommand dbcmd = _connection.CreateCommand ();
 
-                // Insert the new child
-                dbcmd.CommandText = $"insert into child values (null, '{child}', 0)";
+                // Insert the new Toy
+                dbcmd.CommandText = $"insert into Toy values (null, '{toyName}', '{childId}')";
                 Console.WriteLine(dbcmd.CommandText);
                 dbcmd.ExecuteNonQuery ();
 
@@ -47,23 +47,24 @@ namespace BagOLoot
             return _lastId != 0;
         }
 
-        public List<Child> GetChildren ()
+        public List<Toy> GetToy (int childId)
         {
             using (_connection)
             {
                 _connection.Open ();
                 SqliteCommand dbcmd = _connection.CreateCommand ();
 
-                //select the id and name of every child
-                dbcmd.CommandText = "select id, name, delivered from child";
+                //select the id and name of every toy.
+                dbcmd.CommandText = $"select toyId, toyname, childId from toy where childId = '{childId}'";
 
                 using (SqliteDataReader dr = dbcmd.ExecuteReader())
                 {
                     //Read each row in the result set
                     while (dr.Read())
                     {
-                         Child newChild = new Child(dr[1].ToString(), dr.GetInt32(0), dr.GetBoolean(2));
-                        _children.Add(newChild); //Add child name to list
+                        Toy newToy = new Toy(dr.GetInt32(0), dr[1].ToString(), dr.GetInt32(2));
+                        _toys.Add(newToy);
+                         //Add toy name to list
                     }
                 }
 
@@ -71,46 +72,49 @@ namespace BagOLoot
                 dbcmd.Dispose ();
                 _connection.Close ();
             }
-
-            return _children;
+            return _toys;
             // return new List<string>();
         }
 
-        public List<Child> GetChildrenParam(int childId){
-            using(_connection)
-            {
-                _connection.Open();
-                SqliteCommand dbcmd2 = _connection.CreateCommand();
-                //select the Id and name for the id entered
 
-                dbcmd2.CommandText = $"select id, name, delivered from child where id = 3";//
-                using(SqliteDataReader dr2 = dbcmd2.ExecuteReader())
+
+        public List<Toy> ListToy ()
+        {
+            using (_connection)
+            {
+                _connection.Open ();
+                SqliteCommand dbcmd = _connection.CreateCommand ();
+
+                //select the id and name of every toy.
+                dbcmd.CommandText = $"select toyId, toyname, childId from toy";
+
+                using (SqliteDataReader dr1 = dbcmd.ExecuteReader())
                 {
                     //Read each row in the result set
-                    while(dr2.Read())
+                    while (dr1.Read())
                     {
-
+                        Toy newToy = new Toy(dr1.GetInt32(0), dr1[1].ToString(), dr1.GetInt32(2));
+                        _toys.Add(newToy);
+                         //Add toy name to list
                     }
-
-
                 }
 
                 //clean up
-                dbcmd2.Dispose();
-                _connection.Close();
+                dbcmd.Dispose ();
+                _connection.Close ();
             }
-            return _children;
-
+            return _toys;
+            // return new List<string>();
         }
+
         
 
-        public Child GetChild (int childId)
+        public Toy GetToys (int ToyId)
         {
-            Child child = _children.SingleOrDefault(c => c.childId == childId);
+            Toy toy = _toys.SingleOrDefault(t => t.ToyId == ToyId);
 
-            // Inevitably, two children will have the same name. Then what?
-
-            return child;
+            
+            return toy;
         }
     }
 }
